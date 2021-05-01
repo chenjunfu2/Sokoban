@@ -26,7 +26,7 @@ struct map_a {
 //关卡选择结构体
 struct map_j {
 	//关卡个数
-	int map_num;
+	int map_num = 0;
 	//关卡文件位置
 	vector<streampos> map_checkpoint;
 	//是否错误及报错码
@@ -37,29 +37,31 @@ struct map_j {
 
 
 //打开地图
-inline bool open_map(fstream& fin_b, map_a& mpa)
+inline bool open_map(fstream& fin_a, map_a& mpa)
 {
-	fin_b.open("game.ini", ios_base::in | ios_base::binary);
-	if (!fin_b.is_open())
+	fin_a.open("game.ini", ios_base::in);
+	if (!fin_a.is_open())
 	{
-		fin_b.close();
-		fin_b.clear();
-		no_good(mpa.error, open_failed);
+		fin_a.close();
+		fin_a.clear();
+		no_good(mpa.error, open_failed, open_map_F);
 		return false;
 	}
 	return true;
 }
 
 //关闭地图
-inline void close_map_fin(fstream& fin_b)
+inline void close_map_fin(fstream& fin_a)
 {
-	fin_b.clear();
-	fin_b.close();
+	fin_a.clear();
+	fin_a.close();
 }
 
 //清理地图
-inline bool delete_map(struct map_a& mpa)
+inline bool delete_map(map_a& mpa)
 {
+	if (mpa.map == nullptr)
+		return true;
 	try {
 		for (int i = 0; i < mpa.mapx; ++i)
 		{
@@ -71,7 +73,7 @@ inline bool delete_map(struct map_a& mpa)
 	}
 	catch (...) {
 		mpa.map = nullptr;
-		no_good(mpa.error, delete_failed);
+		no_good(mpa.error, delete_failed, delete_map_F);
 		return false;
 	}
 
@@ -79,41 +81,47 @@ inline bool delete_map(struct map_a& mpa)
 }
 
 //关卡转跳
-static inline int jump_map(map_j& mpj, int map_num, fstream& fin_b)
+static inline bool jump_map(fstream& fin_a, map_j& mpj, map_a& mpa, int map_num)
 {
 	if (map_num <= 0 || map_num > mpj.map_num)
 	{
-		return checkpoint_ERROR;
+		no_good(mpa.error, checkpoint_ERROR, jump_map_F);
+		return false;
 	}
+	if (map_num == mpa.checkpoint)
+		return true;
 
-	fin_b.clear();
-	fin_b.seekg(mpj.map_checkpoint[map_num - 1], ios::beg);
-	if (!fin_b.good())
+	fin_a.clear();
+	fin_a.seekg(mpj.map_checkpoint[map_num - 1], ios::beg);
+
+	if (!fin_a.good())
 	{
-		if (fin_b.eof())
+		if (fin_a.eof())
 		{
-			fin_b.clear();
-			return fst_eof;
+			fin_a.clear();
+			no_good(mpa.error, fst_eof, jump_map_F);
+			return false;
 		}
-		return map_JumpFalse;
+		no_good(mpa.error, map_JumpFalse, jump_map_F);
+		return false;
 	}
 
-	return GOOD_ERR;
+	return true;
 }
 
 //跳过行
-static inline bool jump_line(fstream& fin_b, map_a& mpa, int num)
+static inline bool jump_line(fstream& fin_a, map_a& mpa, int num)
 {
 	for (int i = 0; i < num; ++i)
 	{
-		while (fin_b.get() != '\n')
+		while (fin_a.get() != '\n')
 		{
-			if (!fin_b.good())
+			if (!fin_a.good())
 			{
-				if (fin_b.eof())
-					no_good(mpa.error, fst_eof);
+				if (fin_a.eof())
+					no_good(mpa.error, fst_eof, jump_line_F);
 				else
-					no_good(mpa.error, line_JumpFalse);
+					no_good(mpa.error, line_JumpFalse, jump_line_F);
 
 				return false;
 			}
@@ -123,16 +131,16 @@ static inline bool jump_line(fstream& fin_b, map_a& mpa, int num)
 }
 
 //跳至下一个地图
-static inline bool next_map(fstream& fin_b, map_a& mpa)
+static inline bool next_map(fstream& fin_a, map_a& mpa)
 {
-	while (fin_b.get() != '\n')
+	while (fin_a.get() != '\n')
 	{
-		if (!fin_b.good())
+		if (!fin_a.good())
 		{
-			if (fin_b.eof())
-				no_good(mpa.error, fst_eof);
+			if (fin_a.eof())
+				no_good(mpa.error, fst_eof, next_map_F);
 			else
-				no_good(mpa.error, map_JumpFalse);
+				no_good(mpa.error, map_JumpFalse, next_map_F);
 
 			return false;
 		}
@@ -141,56 +149,65 @@ static inline bool next_map(fstream& fin_b, map_a& mpa)
 }
 
 //读取关卡号
-bool read_checkpoint(fstream& fin_b, map_a& mpa, map_j& mpj, int mpn)
+bool read_checkpoint(fstream& fin_a, map_a& mpa, map_j& mpj, int mpn)
 {
 	//map_j mpj = read_map_all();
-conti:
-	fin_b.ignore(6, ':');
-	fin_b >> mpa.checkpoint;
-	if (!fin_b.good())
+//conti:
+	fin_a.ignore(6, ':');
+	fin_a >> mpa.checkpoint;
+
+	if (!fin_a.good())
 	{
-		if (fin_b.eof())
-			goto jump;//no_good(mpa.error, fst_eof);
+		if (fin_a.eof())
+			no_good(mpa.error, fst_eof, read_checkpoint_F);//goto jump;
 		else
-			no_good(mpa.error, checkpoint_ReadFalse);
+			no_good(mpa.error, checkpoint_ReadFalse, read_checkpoint_F);
+		return false;
+	}
+	if (mpa.checkpoint != mpn && mpn <= mpj.map_num && mpj.map_num > 0)
+	{
+		no_good(mpa.error, checkpoint_ERROR, read_checkpoint_F);
 		return false;
 	}
 
+
+	/*
 	if (mpa.checkpoint != mpn && mpn <= mpj.map_num && mpj.map_num > 0)
 	{
 	jump:
 		int rt = 0;
-		if ((rt = jump_map(mpj, mpn, fin_b)) != GOOD_ERR)
+		if ((rt = jump_map(mpj, mpn, fin_a)) != GOOD_ERR)
 		{
-			no_good(mpa.error, rt);
+			no_good(mpa.error, rt, read_checkpoint_F);
 			return false;
 		}
 		else
 			goto conti;
 	}
+	*/
 
 	return true;
 }
 
 //读取地图符号
-static inline bool read_symbol(fstream& fin_b, map_a& mpa)
+static inline bool read_symbol(fstream& fin_a, map_a& mpa)
 {
-	fin_b.ignore(14, ':');
+	fin_a.ignore(14, ':');
 	for (int i = 0; i < 7; ++i)
 	{
-		fin_b.ignore(3, ':');
-		fin_b.get(mpa.map_f[i], 3);
+		fin_a.ignore(3, ':');
+		fin_a.get(mpa.map_f[i], 3);
 		mpa.map_f[i][2] = '\0';
 
-		if (!fin_b.good())
+		if (!fin_a.good())
 		{
-			if (fin_b.eof())
+			if (fin_a.eof())
 			{
-				no_good(mpa.error, fst_eof);
+				no_good(mpa.error, fst_eof, read_symbol_F);
 			}
-			no_good(mpa.error, list_ReadFalse);
+			no_good(mpa.error, list_ReadFalse, read_symbol_F);
 
-			fin_b.clear();
+			fin_a.clear();
 			return false;
 		}
 	}
@@ -198,27 +215,27 @@ static inline bool read_symbol(fstream& fin_b, map_a& mpa)
 }
 
 //读取地图大小(x,y)
-static inline bool read_size(fstream& fin_b, map_a& mpa)
+static inline bool read_size(fstream& fin_a, map_a& mpa)
 {
-	fin_b.ignore(10, ':');
-	fin_b >> mpa.mapx;
-	if (!fin_b.good())
+	fin_a.ignore(10, ':');
+	fin_a >> mpa.mapx;
+	if (!fin_a.good())
 	{
-		if (fin_b.eof())
-			no_good(mpa.error, fst_eof);
+		if (fin_a.eof())
+			no_good(mpa.error, fst_eof, read_size_F);
 		else
-			no_good(mpa.error, sizeX_ReadFalse);
+			no_good(mpa.error, sizeX_ReadFalse, read_size_F);
 		return false;
 	}
 
-	fin_b.ignore(2, '*');
-	fin_b >> mpa.mapy;
-	if (!fin_b.good())
+	fin_a.ignore(2, '*');
+	fin_a >> mpa.mapy;
+	if (!fin_a.good())
 	{
-		if (fin_b.eof())
-			no_good(mpa.error, fst_eof);
+		if (fin_a.eof())
+			no_good(mpa.error, fst_eof, read_size_F);
 		else
-			no_good(mpa.error, sizeY_ReadFalse);
+			no_good(mpa.error, sizeY_ReadFalse, read_size_F);
 		return false;
 	}
 	return true;
@@ -228,23 +245,23 @@ static inline bool read_size(fstream& fin_b, map_a& mpa)
 static inline bool new_map(map_a& mpa)
 {
 	try {
-		mpa.map = new int* [mpa.mapx];//throw bad_alloc;
+		mpa.map = new int* [mpa.mapy];//throw bad_alloc;
 	}
 	catch (bad_alloc) {
 		mpa.map = nullptr;
-		no_good(mpa.error, mapX_NewFalse);
+		no_good(mpa.error, mapX_NewFalse, new_map_F);
 		return false;
 	}
 
 	for (int i = 0; i < mpa.mapy; ++i)
 	{
 		try {
-			mpa.map[i] = new int[mpa.mapy];//throw bad_alloc;
+			mpa.map[i] = new int[mpa.mapx];//throw bad_alloc;
 		}
 		catch (bad_alloc) {
 			delete_map(mpa);
 			mpa.map = nullptr;
-			no_good(mpa.error, mapY_NewFalse);
+			no_good(mpa.error, mapY_NewFalse, new_map_F);
 			return false;
 		}
 	}
@@ -252,40 +269,42 @@ static inline bool new_map(map_a& mpa)
 }
 
 //读取地图数据
-static inline bool read_map(fstream& fin_b, map_a& mpa)
+static inline bool read_map(fstream& fin_a, map_a& mpa)
 {
-	bool have_people = false;
+	//bool have_people = false;
 
-	for (int i = 0; i < mpa.mapx; ++i)//read
+	for (int i = 0; i < mpa.mapy; ++i)//read
 	{
-		for (int j = 0; j < mpa.mapy; ++j)
+		for (int j = 0; j < mpa.mapx; ++j)
 		{
-			fin_b >> mpa.map[i][j];
-			have_people = have_people || (mpa.map[i][j] == 2) || (mpa.map[i][j] == 6);
+			fin_a >> mpa.map[i][j];
+			//cout << mpa.map[i][j];
+			//have_people = have_people || (mpa.map[i][j] == 2) || (mpa.map[i][j] == 6);
 
-			if (!fin_b.good())
+			if (!fin_a.good())
 			{
 				if (i < (mpa.mapx - 1) || j < (mpa.mapy - 1))
 				{
-					if (fin_b.eof())
-						no_good(mpa.error, fst_eof);
+					if (fin_a.eof())
+						no_good(mpa.error, fst_eof, read_map_F);
 					else
-						no_good(mpa.error, map_ReadFalse);
+						no_good(mpa.error, map_ReadFalse, read_map_F);
 					delete_map(mpa);
 				}
-				fin_b.clear();
+				fin_a.clear();
 
 				return false;
 			}
 		}
-		jump_line(fin_b, mpa, 1);
+		jump_line(fin_a, mpa, 1);//错误检查使用
+		//cout << endl;
 	}
 
-	if (!have_people)
-	{
-		no_good(mpa.error, map_PeopleNull);
-		return false;
-	}
+	//if (!have_people)
+	//{
+		//no_good(mpa.error, map_PeopleNull, read_map_F);
+		//return false;
+	//}
 
 	return true;
 }
@@ -294,53 +313,53 @@ static inline bool read_map(fstream& fin_b, map_a& mpa)
 for (int i = 0; i < mpa.mapy; ++i)
 {
 	string flag;
-	getline(fin_b, flag, '\n');
+	getline(fin_a, flag, '\n');
 	cout << flag << endl;
 }
 */
 
 
 //关卡个数读取并将每一关卡的文件随机访问位置储存
-inline map_j read_map_all(fstream& fin_b)
+inline map_j read_map_all(fstream& fin_a)
 {
-	fin_b.seekg(0, ios::beg);
+	fin_a.seekg(0, ios::beg);
 	map_j mpj = { 0 };
 	string str, aims = "关卡:";
 
 	while (true)
 	{
-		getline(fin_b, str, '\n');
+		getline(fin_a, str, '\n');
 
-		if (!fin_b.good())
+		if (!fin_a.good())
 		{
-			if (fin_b.eof())
+			if (fin_a.eof())
 			{
 				//no_good(mpj.error, fst_eof);
-				fin_b.clear();
-				fin_b.seekg(0, ios::beg);
+				fin_a.clear();
+				fin_a.seekg(0, ios::beg);
 				break;
 			}
-			no_good(mpj.error, checkpoint_ReadFalse);
-			fin_b.clear();
-			fin_b.seekg(0, ios::beg);
+			no_good(mpj.error, checkpoint_ReadFalse, read_map_all_F);
+			fin_a.clear();
+			fin_a.seekg(0, ios::beg);
 			break;
 		}
 
 		if (str.find(aims) != string::npos)
 		{
 			//cout << str << endl;
-			fin_b.seekg(-(long)(str.size() + 1), ios_base::cur);//返回上一行
+			fin_a.seekg(-(long)(str.size() + 1), ios_base::cur);//返回上一行
 
-			mpj.map_checkpoint.push_back(fin_b.tellg());//储存当前文件位置
+			mpj.map_checkpoint.push_back(fin_a.tellg());//储存当前文件位置
 
-			while (fin_b.get() != '\n')//跳过此行防止重复记录
+			while (fin_a.get() != '\n')//跳过此行防止重复记录
 			{
-				if (!fin_b.good())
+				if (!fin_a.good())
 				{
-					if (fin_b.eof())
-						no_good(mpj.error, fst_eof);
+					if (fin_a.eof())
+						no_good(mpj.error, fst_eof, read_map_all_F);
 					else
-						no_good(mpj.error, line_JumpFalse);
+						no_good(mpj.error, line_JumpFalse, read_map_all_F);
 					goto end;
 				}
 			}
@@ -366,61 +385,62 @@ inline int map_jump_menu(map_j& mp_jump)
 	{
 		cin.clear();
 		cout << "请重新输入\n";
-		while (cin.get() != '\n')
-			continue;
+		while (getchar() != '\n')continue;
 		cin >> input;
 	}
+	while (getchar() != '\n')continue;
 
 	return input;
 }
 
 //读取关卡
-inline map_a read_mapCp(map_j& mpj, fstream& fin_b, int mpn)
+inline map_a read_mapCp(map_j& mpj, fstream& fin_a, int mpn)
 {
-	static int n_mpn = 0;
+	//static int n_mpn = 0;
 	map_a mpa;
 	delete_map(mpa);
 
 	//1
 	if (mpn <= 0 || mpn > mpj.map_num)
 	{
-		no_good(mpa.error, checkpoint_ERROR);
+		no_good(mpa.error, checkpoint_ERROR, read_mapCp_F);
 		return mpa;
 	}
 	else if (mpn == 1)
 	{
-		fin_b.seekg(0, ios::beg);
-		if (!jump_line(fin_b, mpa, 3))
+		fin_a.seekg(0, ios::beg);
+		if (!jump_line(fin_a, mpa, 3))
 			return mpa;
 	}
-	else if (mpj.map_num != mpn)
-	{
-		if (!next_map(fin_b, mpa))
-			return mpa;
-	}
+	//else if (mpj.map_num != mpn)
+	//{
+	//	if (!next_map(fin_a, mpa))
+	//		return mpa;
+	//}
 	else
 	{
-		fin_b.clear();
-		jump_map(mpj, mpj.map_num - 1, fin_b);
+		fin_a.clear();
+		if (!jump_map(fin_a, mpj, mpa, mpn))
+			return mpa;
 	}
 
 	//2
-	n_mpn = mpn;
+	//n_mpn = mpn;
 
 	//3
-	if (!read_checkpoint(fin_b, mpa, mpj, mpn))
+	if (!read_checkpoint(fin_a, mpa, mpj, mpn))
 		return mpa;
 
 	//4
-	if (!read_symbol(fin_b, mpa))
+	if (!read_symbol(fin_a, mpa))
 		return mpa;
 
 	//5
-	if (!read_size(fin_b, mpa))
+	if (!read_size(fin_a, mpa))
 		return mpa;
 
 	//6
-	if (!jump_line(fin_b, mpa, 2))
+	if (!jump_line(fin_a, mpa, 2))
 		return mpa;
 
 	//7
@@ -428,7 +448,7 @@ inline map_a read_mapCp(map_j& mpj, fstream& fin_b, int mpn)
 		return mpa;
 
 	//8
-	if (!read_map(fin_b, mpa))
+	if (!read_map(fin_a, mpa))
 		return mpa;
 	
 
