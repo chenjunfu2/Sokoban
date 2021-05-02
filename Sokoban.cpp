@@ -56,18 +56,22 @@ int main(void)
 		case '1':
 		game_i:
 			system("cls");
+			see_cursor_hide_show(false);
 			game_switch = menu_game();
 			break;
 		case '2':
 			system("cls");
+			see_cursor_hide_show(false);
 			menu_explain();
 			break;
 		case '3':
 			system("cls");
+			see_cursor_hide_show(false);
 			menu_about();
 			break;
 		case '4':
 			system("cls");
+			see_cursor_hide_show(false);
 			goto end;
 			break;
 		default:
@@ -85,6 +89,7 @@ int main(void)
 			//break;
 		case '1':
 			system("cls");
+			see_cursor_hide_show(false);
 			{
 				//进行游戏
 				int gme = 0, gme_n = 1;
@@ -149,10 +154,12 @@ int main(void)
 			break;
 		case '3':
 			system("cls");
+			see_cursor_hide_show(false);
 			goto ctu_s;
 			break;
 		case '4':
 			system("cls");
+			see_cursor_hide_show(false);
 			goto end;
 			break;
 		default:
