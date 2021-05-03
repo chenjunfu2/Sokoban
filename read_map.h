@@ -14,7 +14,7 @@ struct map_a {
 	//地图大小及指针
 	int mapx = 0;
 	int mapy = 0;
-	int** map = nullptr;
+	int** map = NULL;
 	//对应地图符号
 	char map_f[7][3] = { {0} };
 	//关卡号
@@ -60,19 +60,20 @@ inline void close_map_fin(fstream& fin_a)
 //清理地图
 inline bool delete_map(map_a& mpa)
 {
-	if (mpa.map == nullptr)
+	if (mpa.map == NULL)
 		return true;
+
 	try {
-		for (int i = 0; i < mpa.mapx; ++i)
+		for (int i = 0; i < mpa.mapy; ++i)
 		{
 			delete[] mpa.map[i];
-			mpa.map[i] = nullptr;
+			mpa.map[i] = NULL;
 		}
 		delete[] mpa.map;
-		mpa.map = nullptr;
+		mpa.map = NULL;
 	}
 	catch (...) {
-		mpa.map = nullptr;
+		mpa.map = NULL;
 		no_good(mpa.error, delete_failed, delete_map_F);
 		return false;
 	}
@@ -248,7 +249,7 @@ static inline bool new_map(map_a& mpa)
 		mpa.map = new int* [mpa.mapy];//throw bad_alloc;
 	}
 	catch (bad_alloc) {
-		mpa.map = nullptr;
+		mpa.map = NULL;
 		no_good(mpa.error, mapX_NewFalse, new_map_F);
 		return false;
 	}
@@ -260,7 +261,7 @@ static inline bool new_map(map_a& mpa)
 		}
 		catch (bad_alloc) {
 			delete_map(mpa);
-			mpa.map = nullptr;
+			mpa.map = NULL;
 			no_good(mpa.error, mapY_NewFalse, new_map_F);
 			return false;
 		}
@@ -396,9 +397,7 @@ inline int map_jump_menu(map_j& mp_jump)
 //读取关卡
 inline map_a read_mapCp(map_j& mpj, fstream& fin_a, int mpn)
 {
-	//static int n_mpn = 0;
 	map_a mpa;
-	delete_map(mpa);
 
 	//1
 	if (mpn <= 0 || mpn > mpj.map_num)
@@ -406,26 +405,11 @@ inline map_a read_mapCp(map_j& mpj, fstream& fin_a, int mpn)
 		no_good(mpa.error, checkpoint_ERROR, read_mapCp_F);
 		return mpa;
 	}
-	else if (mpn == 1)
-	{
-		fin_a.seekg(0, ios::beg);
-		if (!jump_line(fin_a, mpa, 3))
-			return mpa;
-	}
-	//else if (mpj.map_num != mpn)
-	//{
-	//	if (!next_map(fin_a, mpa))
-	//		return mpa;
-	//}
-	else
-	{
-		fin_a.clear();
-		if (!jump_map(fin_a, mpj, mpa, mpn))
-			return mpa;
-	}
 
 	//2
-	//n_mpn = mpn;
+	fin_a.clear();
+	if (!jump_map(fin_a, mpj, mpa, mpn))
+		return mpa;
 
 	//3
 	if (!read_checkpoint(fin_a, mpa, mpj, mpn))
@@ -454,5 +438,30 @@ inline map_a read_mapCp(map_j& mpj, fstream& fin_a, int mpn)
 
 	return mpa;
 }
+
+
+//static int n_mpn = 0;
+//delete_map(mpa);
+
+//else if (mpn == 1)
+	//{
+		//fin_a.seekg(0, ios::beg);
+		//if (!jump_line(fin_a, mpa, 3))
+			//return mpa;
+	//}
+	//else if (mpj.map_num != mpn)
+	//{
+	//	if (!next_map(fin_a, mpa))
+	//		return mpa;
+	//}
+	//else
+	//{
+		//fin_a.clear();
+		//if (!jump_map(fin_a, mpj, mpa, mpn))
+			//return mpa;
+	//}
+
+	//2
+	//n_mpn = mpn;
 
 #endif

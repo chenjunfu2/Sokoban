@@ -101,6 +101,7 @@ int main(void)
 					Sleep(1100);
 
 					gme = game(mpa.map, mpa.mapx, mpa.mapy, mpa.map_f);
+					delete_map(mpa);
 
 					if (gme == 1)
 					{
@@ -136,6 +137,7 @@ int main(void)
 					Sleep(1100);
 
 					gme = game(mpa.map, mpa.mapx, mpa.mapy, mpa.map_f);
+					delete_map(mpa);
 
 					if (gme == 1)
 					{
@@ -171,7 +173,7 @@ int main(void)
 		}
 	}
 
-		
+	
 end:
 	delete_map(mpa);
 	close_map_fin(fin_a);
