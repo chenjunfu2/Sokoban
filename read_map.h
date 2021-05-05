@@ -37,17 +37,17 @@ struct map_j {
 
 
 //打开地图
-inline bool open_map(fstream& fin_a, map_a& mpa)
+inline ERR open_map_r(fstream& fin_a)//, map_a& mpa
 {
+	ERR error;
 	fin_a.open("game.ini", ios_base::in);
 	if (!fin_a.is_open())
 	{
 		fin_a.close();
 		fin_a.clear();
-		no_good(mpa.error, open_failed, open_map_F);
-		return false;
+		no_good(error, open_failed, open_map_F);
 	}
-	return true;
+	return error;
 }
 
 //关闭地图
@@ -400,7 +400,7 @@ inline map_a read_mapCp(map_j& mpj, fstream& fin_a, int mpn)
 	map_a mpa;
 
 	//1
-	if (mpn <= 0 || mpn > mpj.map_num)
+	if (mpn < 1 || mpn > mpj.map_num)
 	{
 		no_good(mpa.error, checkpoint_ERROR, read_mapCp_F);
 		return mpa;

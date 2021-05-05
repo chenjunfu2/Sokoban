@@ -10,6 +10,18 @@
 #include "error.h"
 using namespace std;
 
+#define REDO		0//重做
+#define MOVE		1//移动
+#define REVOKE		2//撤销
+#define NODO		3//重绘
+
+#define REGAME		4//重玩
+#define LASTCHECK	5//上一关
+#define NEXTCHECK	6//下一关
+#define QUIT		7//退出
+#define END			8//结束
+
+
 //玩家坐标结构体
 typedef struct peo {
 	int x = 0;
@@ -434,7 +446,7 @@ template <typename T>
 static inline int get_keyb(T map, int mx, int my, peo& pe, NODE& nodeR, NODE& nodeF)
 {
 	//int ch, mov;
-	int mov = -1;
+	int mov = NODO;
 
 	start1:
 	//{
@@ -467,27 +479,66 @@ static inline int get_keyb(T map, int mx, int my, peo& pe, NODE& nodeR, NODE& no
 		break;
 	case 'r'://revoke
 	case 'R':
-		mov = 2;
+		mov = REVOKE;
 		if (!move_r(map, mx, my, pe, nodeR, nodeF))
 			goto start1;
 		break;
 	case 'f'://redo
 	case 'F':
-		mov = 0;
+		mov = REDO;
 		if (!move_f(map, mx, my, pe, nodeR, nodeF))
 			goto start1;
+		break;
+	case 'e'://regame
+	case 'E':
+		ShowCursor(true);
+		if (sure("重玩"))
+		{
+			mov = REGAME;
+			Del_AllQueue(nodeR);
+			Del_AllQueue(nodeF);
+		}
+		else
+			mov = NODO;
+		ShowCursor(false);
+		break;
+	case 'z'://last checkpoint
+	case 'Z':
+		ShowCursor(true);
+		if (sure("上一关"))
+		{
+			mov = LASTCHECK;
+			Del_AllQueue(nodeR);
+			Del_AllQueue(nodeF);
+		}
+		else
+			mov = NODO;
+		ShowCursor(false);
+		break;
+	case 'x'://next checkpoint
+	case 'X':
+		ShowCursor(true);
+		if (sure("下一关"))
+		{
+			mov = NEXTCHECK;
+			Del_AllQueue(nodeR);
+			Del_AllQueue(nodeF);
+		}
+		else
+			mov = NODO;
+		ShowCursor(false);
 		break;
 	case 'q'://quit
 	case 'Q':
 		ShowCursor(true);
 		if (sure("退出"))
 		{
-			mov = 3;
+			mov = QUIT;
 			Del_AllQueue(nodeR);
 			Del_AllQueue(nodeF);
 		}
 		else
-			mov = 4;
+			mov = NODO;
 		ShowCursor(false);
 		break;
 	default:
@@ -531,7 +582,7 @@ inline int game(T map, int mx, int my, D map_f)
 	peo pe = find_peo(map, mx, my);
 	if (error(pe.error))
 		return false;
-	int num = 0;//, keyb = 0;
+	int num = 0, keyb = 0;
 	NODE nodeR, nodeF;
 
 	if (error(init_map(map, mx, my, map_f)))//绘制全地图
@@ -549,25 +600,23 @@ inline int game(T map, int mx, int my, D map_f)
 		}
 
 	con1:
-		switch (get_keyb(map, mx, my, pe, nodeR, nodeF))//得到键盘输入并进行游戏
+		switch (keyb = get_keyb(map, mx, my, pe, nodeR, nodeF))//得到键盘输入并进行游戏
 		{
-		case 0:
-		case 1:
+		case REDO:
+		case MOVE:
 			++num;//如果有移动或重做步数递增
 			break;
-		case 2:
+		case REVOKE:
 			--num;//如果撤销步数递减
 			break;
-		case 3:
-			return -1;//退出游戏并返回上层
-			break;
-		case 4:
+		case NODO:
 			system("cls");
-			init_map(map, mx, my, map_f);//如果不退出则重绘全部地图
+			init_map(map, mx, my, map_f);//如果不操作则重绘全部地图
 			cout << "第" << num << "步" << "  ";
 			goto con1;
 			break;
 		default:
+			return keyb - 4;//4567->0123
 			break;
 		}
 
@@ -582,7 +631,7 @@ inline int game(T map, int mx, int my, D map_f)
 		cout << "第" << num << "步" << "  ";
 	}
 
-	return 1;
+	return END - 4;//8->4
 }
 
 

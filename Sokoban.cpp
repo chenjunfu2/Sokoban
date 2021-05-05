@@ -3,22 +3,24 @@
 #include "game.h"
 #include "read_map.h"
 #include "make_map.h"
+#include "switch.h"
 
 int main(void)
 {
 	ShowCursor(false);//隐藏光标
 
-	map_a mpa;
 	map_j mpj;
 	fstream fin_a;
 
-	if (!open_map(fin_a, mpa))
+	//打开地图
+	if (error(open_map_r(fin_a)))
 	{
-		cerr << "地图打开失败！" << endl;
 		if (!error(make_map()))
 			cerr << "地图模板写入成功,重启后生效！" << endl << endl;
 		else
 		{
+			cerr << "地图模板写入失败！" << endl << endl;
+			close_map_fin(fin_a);
 			sypose();
 			return 1;
 		}
@@ -27,155 +29,33 @@ int main(void)
 		return 0;
 	}
 
-	cout << "地图读取中..." << endl;
-	mpj = read_map_all(fin_a);
-	//mpa = read_mapCp(mpj, fin_a, 1); || error(mpa.error)
-	Sleep(500);
-	
-	if (error(mpj.error))//读取判断
+	//读取地图
 	{
-		close_map_fin(fin_a);
-		sypose();
-		return 1;
-	}
-	else
-	{
-		cout << "读取成功！" << endl;
-		Sleep(510);
-		system("cls");
-	}
-		
+		cout << "地图读取中..." << endl;
+		mpj = read_map_all(fin_a);
+		Sleep(500);
 
-
-	//关卡选择
-	int game_switch = '3';
-	{
-	ctu_s:
-		switch (menu_page())
+		if (error(mpj.error))//读取判断
 		{
-		case '1':
-		game_i:
-			system("cls");
-			see_cursor_hide_show(false);
-			game_switch = menu_game();
-			break;
-		case '2':
-			system("cls");
-			see_cursor_hide_show(false);
-			menu_explain();
-			break;
-		case '3':
-			system("cls");
-			see_cursor_hide_show(false);
-			menu_about();
-			break;
-		case '4':
-			system("cls");
-			see_cursor_hide_show(false);
-			goto end;
-			break;
-		default:
-			system("cls");
-			cerr << "menu_page error!\n";
+			close_map_fin(fin_a);
 			sypose();
-			goto end;
-			break;
+			return 1;
 		}
-		switch (game_switch)
+		else
 		{
-		//case 0:
-			//system("cls");
-			//goto ctu_s;
-			//break;
-		case '1':
+			cout << "读取成功！" << endl;
+			Sleep(510);
 			system("cls");
-			see_cursor_hide_show(false);
-			{
-				//进行游戏
-				int gme = 0, gme_n = 1;
-				mpa = read_mapCp(mpj, fin_a, gme_n);
-
-				while (!error(mpa.error))
-				{
-					cout << "第" << mpa.checkpoint << "关";
-					Sleep(1100);
-
-					gme = game(mpa.map, mpa.mapx, mpa.mapy, mpa.map_f);
-					delete_map(mpa);
-
-					if (gme == 1)
-					{
-						cout << endl << endl;
-						sypose();
-						system("cls");
-						mpa = read_mapCp(mpj, fin_a, ++gme_n);
-					}
-					else if (gme == -1)
-						goto game_i;
-					else
-						break;
-				}
-				cout << "游戏结束！" << endl << endl << flush;//换行并刷新缓冲区
-			}
-			break;
-		case '2':
-		gme_se:
-			system("cls");
-			{
-				ShowCursor(true);//显示光标
-				int mpn = map_jump_menu(mpj);
-				ShowCursor(false);//隐藏光标
-				if (mpn == -1)
-					goto game_i;
-
-				mpa = read_mapCp(mpj, fin_a, mpn);
-				int gme = 0;
-				if (!error(mpa.error))
-				{
-					system("cls");
-					cout << "第" << mpa.checkpoint << "关";
-					Sleep(1100);
-
-					gme = game(mpa.map, mpa.mapx, mpa.mapy, mpa.map_f);
-					delete_map(mpa);
-
-					if (gme == 1)
-					{
-						cout << endl << endl;
-						sypose();
-						system("cls");
-						goto gme_se;
-					}
-						
-					else if (gme == -1)
-						goto gme_se;
-					else
-						break;
-				}
-			}
-			break;
-		case '3':
-			system("cls");
-			see_cursor_hide_show(false);
-			goto ctu_s;
-			break;
-		case '4':
-			system("cls");
-			see_cursor_hide_show(false);
-			goto end;
-			break;
-		default:
-			system("cls");
-			cerr << "menu_game error!\n";
-			sypose();
-			goto end;
-			break;
 		}
 	}
+	
+
+	//关卡选择、进行游戏
+	game_switch(mpj, fin_a);
 
 	
-end:
-	delete_map(mpa);
+//end:
+	//delete_map(mpa);
 	close_map_fin(fin_a);
 	sypose();//等待函数
 

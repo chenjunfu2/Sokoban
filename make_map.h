@@ -385,7 +385,7 @@ char map_f[MAX_MAP][7][3] =
 
 
 
-static inline bool open_map(fstream& fout_a)
+static inline bool open_map_m(fstream& fout_a)
 {
 	fout_a.open("game.ini", ios_base::out | ios_base::trunc);
 	if (!fout_a.is_open())
@@ -459,7 +459,7 @@ inline ERR make_map(void)
 	fstream fout_a;
 	ERR error;
 
-	if (!open_map(fout_a))
+	if (!open_map_m(fout_a))
 	{
 		no_good(error, open_failed, make_map_F);
 		return error;
