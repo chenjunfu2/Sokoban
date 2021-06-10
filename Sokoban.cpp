@@ -1,13 +1,35 @@
-﻿#include "error.h"
-#include "menu.h"
-#include "game.h"
-#include "read_map.h"
-#include "make_map.h"
-#include "switch.h"
+﻿#include "Sokoban.h"
 
-int main(void)
+using namespace std;
+
+int main(int argc, char* argv[])//以Sokoban后缀文件参数启动直接进入播放
 {
+	system("cls");
 	ShowCursor(false);//隐藏光标
+
+	if (argc == 2 || argc == 3)
+	{
+		bool p;
+		map_a mpa = Read_MLD(argv[1], p);
+
+		if (!p)
+		{
+			ShowCursor(true);
+			if (!sure("播放残局文件"))
+				return 0;
+			ShowCursor(false);
+		}
+			
+
+		if(argc==2)
+			game_p(mpa, 100, p);
+		else
+			game_p(mpa, atol(argv[2]), p);
+
+		delete_map(mpa);
+		sypose();
+		return 0;
+	}
 
 	map_j mpj;
 	fstream fin_a;
@@ -54,6 +76,7 @@ int main(void)
 	game_switch(mpj, fin_a);
 
 	
+
 //end:
 	//delete_map(mpa);
 	close_map_fin(fin_a);

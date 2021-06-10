@@ -1,7 +1,8 @@
 #pragma once
 
-#ifndef _ERROR
-#define _ERROR
+#ifndef _error
+#define _error
+
 #include <stdio.h>
 
 //ERROR_NUM_ALL		0 ~ 10
@@ -25,7 +26,7 @@
 #define mapY_NewFalse			0x0013
 #define map_ReadFalse			0x0014
 
-//linked_list	21 ~ -30
+//linked_list	21 ~ 30
 #define cpQueue_Null			0x0015
 #define hpQueue_Null			0x0016
 #define cpQueue_Have			0x0017
@@ -38,40 +39,72 @@
 //game			41 ~ 50
 #define map_Default				0x0029
 
-//save_map+list	51 ~ 60
-#define lctime_Small			0x0033
+//make_map_list	51 ~ 60
+#define file_WriteFalse			0x0033
+#define file_ReadFalse			0x0034
 
-//FUNTION		101 ~ 150	(0x0065 ~ 0x007B)
+//make_map_list 61 ~ 65
+#define binhead_WriteFalse		0x003D
+#define Bmapf_WriteFalse		0x003E
+#define Bmap_WriteFalse			0x003F
+
+//read_map_list 66 ~ 75
+#define binhead_ReadFalse		0x0042
+#define bhStrFalse				0x0043
+#define bhSizeFalse				0x0044
+#define Bmapf_SeekFalse			0x0045
+#define Bmapf_ReadFalse			0x0046
+#define Bmap_SeekFalse			0x0047
+#define Bmap_ReadFalse			0x0048
+#define Blink_SeekFalse			0x0049
+#define Blink_ReadFalse			0x004A
+
+
+
+//FUNTION		101 ~ 136	(0x0065 ~ 0x0088)
 #define init_map_F				0x0065
 #define init_peo_F				0x0066
 #define find_peo_F				0x0067
 
 #define Add_CpQueue_F			0x0068
-#define Del_CpQueue_F			0x0069
-#define Del_AllQueue_F			0x006A
-#define Find_CpQueue_F			0x006B
-#define See_All_F				0x006C
-#define Add_All_F				0x006D
-#define Move_CpQ_To_CpQ_F		0x006E
+#define Add_HpQueue_F			0x0069
+#define Del_CpQueue_F			0x006A
+#define Del_AllQueue_F			0x006B
+#define Find_CpQueue_F			0x006C
+#define Find_HpQueue_F			0x006D
+#define See_All_F				0x006E
+#define Add_All_F				0x006F
+#define Move_CpQ_To_CpQ_F		0x0070
+#define Move_HpQ_To_HpQ_F		0x0071
 								
-#define make_map_F				0x006F
+#define make_map_F				0x0072
 								
-#define open_map_F				0x0070
-#define delete_map_F			0x0071
-#define jump_map_F				0x0072
-#define jump_line_F				0x0073
-#define next_map_F				0x0074
-#define read_checkpoint_F		0x0075
-#define read_symbol_F			0x0076
-#define read_size_F				0x0077
-#define new_map_F				0x0078
-#define read_map_F				0x0079
-#define read_map_all_F			0x007A
-#define read_mapCp_F			0x007B
+#define open_map_F				0x0073
+#define delete_map_F			0x0074
+#define jump_map_F				0x0075
+#define jump_line_F				0x0076
+#define next_map_F				0x0077
+#define read_checkpoint_F		0x0078
+#define read_symbol_F			0x0079
+#define read_size_F				0x007A
+#define new_map_F				0x007B
+#define read_map_F				0x007C
+#define read_map_all_F			0x007D
+#define read_mapCp_F			0x007E
 								
-#define Get_Time_F				0x007C
+#define fSee_P_F				0x007F
+#define fAdd_P_F				0x0080
 
-const char* reason[60] =
+#define MakeMapfBF_F			0x0081
+#define MakeMapBF_F				0x0082
+#define Make_MLD_F				0x0083
+
+#define ReadMapfBF_F			0x0084
+#define ReadMapBF_F				0x0085
+#define ReadLinkBF_F			0x0086
+#define Read_MLD_F				0x0087
+
+static const char* reason[] =
 {
 	//0
 	"没有错误（自相矛盾）",
@@ -137,7 +170,8 @@ const char* reason[60] =
 	"",
 
 	//51 ~ 60
-	"时间字符串字段过小！",
+	"链表数据写入失败",
+	"链表数据读取失败",
 	"",
 	"",
 	"",
@@ -146,44 +180,40 @@ const char* reason[60] =
 	"",
 	"",
 	"",
+
+	//61 ~ 65
+	"二进制文件头写入失败"
+	"二进制地图符号写入失败",
+	"二进制地图写入失败",
+	"",
+	"",
+
+	//66 ~ 75
+	"二进制文件头读取失败",
+	"文件头校验信息不符",
+	"文件头大小不符",
+	"地图符号定位失败",
+	"地图符号读取失败",
+	"地图定位失败",
+	"地图读取失败",
+	"链表定位失败",
+	"链表读取失败",
 	"",
 };
 
 typedef struct err {
 	bool no_good = false;
-	int err_num = GOOD_ERR;
-	unsigned err_HEX = 0x0000;
+	unsigned err_num = GOOD_ERR;//错误码
+	unsigned err_fun = 0x0000;//报错函数
+	unsigned err_msg = 000000;//附加的报错信息
 }ERR;
 
 
 //错误
-inline void no_good(ERR& error, int error_num, unsigned err_HEX)
-{
-	error.no_good = true;
-	error.err_num = error_num;
-	error.err_HEX = err_HEX;
-}
+extern inline void no_good(ERR& error, unsigned err_num, unsigned err_fun, unsigned err_msg = 0);
 //撤销错误
-inline void are_good(ERR& error)
-{
-	error.no_good = false;
-	error.err_num = GOOD_ERR;
-	error.err_HEX = 0x0000;
-}
-
+extern inline void are_good(ERR& error);
 //报错函数
-inline bool error(ERR error)
-{
-	if (error.no_good == false)
-		return false;
-	if (error.err_num == GOOD_ERR)
-		return false;
-
-	fprintf(stderr, "\nERROR:\n");
-	fprintf(stderr, "FUNTION_CODE=0x%04X ERROR_CODE=0x%04X\nERROR_REASON=%s\n\n", error.err_HEX, error.err_num, reason[error.err_num]);
-
-	return error.no_good;
-}
-
+extern inline bool error(ERR error);
 
 #endif
