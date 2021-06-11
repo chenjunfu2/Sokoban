@@ -204,11 +204,7 @@ extern inline ERR See_All_G(const NODE& node, T fSee_P)//bool(*const fSee_P)(con
 		if (fSee_P(seeQueue->list_x, seeQueue->list_y, seeQueue->list_n))
 			seeQueue = seeQueue->nQueue;
 		else
-		{
-			//±£¥Ê ß∞‹±®¥Ì
-			no_good(error, file_WriteFalse, fSee_P_F, 1);
 			break;
-		}
 	}
 
 	return error;
@@ -232,11 +228,7 @@ extern inline ERR See_All_B(const NODE& node, T fSee_P)//bool(*const fSee_P)(con
 		if (fSee_P(seeQueue->list_x, seeQueue->list_y, seeQueue->list_n))
 			seeQueue = seeQueue->uQueue;
 		else
-		{
-			//±£¥Ê ß∞‹±®¥Ì
-			no_good(error, file_WriteFalse, fSee_P_F, 2);
 			break;
-		}
 	}
 
 	return error;

@@ -96,7 +96,7 @@ ctu_s:
 					mpa = read_mapCp(mpj, fin_a, mpn);
 					break;
 				case SAVE - 5:
-					Make_MLD(mpa, false);
+					if (error(Make_MLD(mpa, false))) goto br1;
 					delete_map(mpa);
 					cout << endl << endl << "残局保存成功！" << endl;
 					sypose();
@@ -108,7 +108,7 @@ ctu_s:
 					goto game_i;
 					break;
 				case END - 5:
-					Make_MLD(mpa, true);
+					if (error(Make_MLD(mpa, true))) goto br1;
 					delete_map(mpa);
 					cout << endl << endl << "回放保存成功！" << endl;
 					sypose();
@@ -156,10 +156,11 @@ ctu_s:
 				goto game_i;
 			}
 
+			system("cls");
 			switch (game(mpa) - 3)
 			{
 			case SAVE - 5 - 3:
-				Make_MLD(mpa, false);
+				if (error(Make_MLD(mpa, false))) goto br2;
 				delete_map(mpa);
 				cout << endl << endl << "残局保存成功！" << endl;
 				sypose();
@@ -170,7 +171,7 @@ ctu_s:
 				goto game_i;
 				break;
 			case END - 5 - 3:
-				Make_MLD(mpa, true);
+				if (error(Make_MLD(mpa, true))) goto br2;
 				delete_map(mpa);
 				cout << endl << endl << "回放保存成功！" << endl;
 				sypose();
@@ -215,6 +216,8 @@ ctu_s:
 					break;
 				ShowCursor(false);
 			}
+
+			system("cls");
 			game_p(mpa, iptn, p);
 			delete_map(mpa);
 

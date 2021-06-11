@@ -93,8 +93,6 @@ bool Read_Link_BinFile(map_a& mpa, fstream& fin, streamoff& RLinkPos, streamoff&
 							list_n = LinkD.list_n;
 							return true;
 						}
-						//else if (fin.eof())
-							//return false;
 						else
 						{
 							no_good(mpa.error, Blink_ReadFalse, ReadLinkBF_F, 1);
@@ -132,8 +130,6 @@ bool Read_Link_BinFile(map_a& mpa, fstream& fin, streamoff& RLinkPos, streamoff&
 							list_n = LinkD.list_n;
 							return true;
 						}
-						//else if (fin.eof())
-							//return false;
 						else
 						{
 							no_good(mpa.error, Blink_ReadFalse, ReadLinkBF_F, 2);

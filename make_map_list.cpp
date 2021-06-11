@@ -65,14 +65,17 @@ bool Make_Link_BinFile(map_a& mpa, fstream& fout, streamoff& RLinkPos, streamoff
 		RLinkPos = fout.tellp();
 		{
 			mpa.error = See_All_G(mpa.nodeR,
-				[&fout](const int& list_x, const int& list_y, const int& list_n) -> bool
+				[&](const int& list_x, const int& list_y, const int& list_n) -> bool
 				{
 					LinkData LinkD = { list_x,list_y,list_n };
 					//cout << endl << list_x << list_y << list_n << endl;
 					if (fout.write((const char*)(&LinkD), sizeof(LinkData)).good())
 						return true;
 					else
+					{
+						no_good(mpa.error, Blink_WriteFalse, MakeLinkBF_F, 1);
 						return false;
+					}
 				});
 			if (mpa.error.no_good)
 				return false;
@@ -83,14 +86,17 @@ bool Make_Link_BinFile(map_a& mpa, fstream& fout, streamoff& RLinkPos, streamoff
 		FLinkPos = fout.tellp();
 		{
 			mpa.error = See_All_G(mpa.nodeF,
-				[&fout](const int& list_x, const int& list_y, const int& list_n) -> bool
+				[&](const int& list_x, const int& list_y, const int& list_n) -> bool
 				{
 					LinkData LinkD = { list_x,list_y,list_n };
 					//cout << endl << list_x << list_y << list_n << endl;
 					if (fout.write((const char*)(&LinkD), sizeof(LinkData)).good())
 						return true;
 					else
+					{
+						no_good(mpa.error, Blink_WriteFalse, MakeLinkBF_F, 2);
 						return false;
+					}
 				});
 			if (mpa.error.no_good)
 				return false;

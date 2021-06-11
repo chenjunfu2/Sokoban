@@ -40,24 +40,21 @@
 #define map_Default				0x0029
 
 //make_map_list	51 ~ 60
-#define file_WriteFalse			0x0033
-#define file_ReadFalse			0x0034
+#define binhead_WriteFalse		0x0033
+#define Bmapf_WriteFalse		0x0034
+#define Bmap_WriteFalse			0x0035
+#define Blink_WriteFalse		0x0036
 
-//make_map_list 61 ~ 65
-#define binhead_WriteFalse		0x003D
-#define Bmapf_WriteFalse		0x003E
-#define Bmap_WriteFalse			0x003F
-
-//read_map_list 66 ~ 75
-#define binhead_ReadFalse		0x0042
-#define bhStrFalse				0x0043
-#define bhSizeFalse				0x0044
-#define Bmapf_SeekFalse			0x0045
-#define Bmapf_ReadFalse			0x0046
-#define Bmap_SeekFalse			0x0047
-#define Bmap_ReadFalse			0x0048
-#define Blink_SeekFalse			0x0049
-#define Blink_ReadFalse			0x004A
+//read_map_list 61 ~ 70
+#define binhead_ReadFalse		0x0037
+#define bhStrFalse				0x0038
+#define bhSizeFalse				0x0039
+#define Bmapf_SeekFalse			0x0040
+#define Bmapf_ReadFalse			0x0041
+#define Bmap_SeekFalse			0x0042
+#define Bmap_ReadFalse			0x0043
+#define Blink_SeekFalse			0x0044
+#define Blink_ReadFalse			0x0045
 
 
 
@@ -97,12 +94,13 @@
 
 #define MakeMapfBF_F			0x0081
 #define MakeMapBF_F				0x0082
-#define Make_MLD_F				0x0083
+#define MakeLinkBF_F			0x0083
+#define Make_MLD_F				0x0084
 
-#define ReadMapfBF_F			0x0084
-#define ReadMapBF_F				0x0085
-#define ReadLinkBF_F			0x0086
-#define Read_MLD_F				0x0087
+#define ReadMapfBF_F			0x0085
+#define ReadMapBF_F				0x0086
+#define ReadLinkBF_F			0x0087
+#define Read_MLD_F				0x0088
 
 static const char* reason[] =
 {
@@ -158,7 +156,7 @@ static const char* reason[] =
 	"",
 
 	//41 ~ 50
-	"地图标记错误"
+	"地图标记错误",
 	"",
 	"",
 	"",
@@ -170,34 +168,27 @@ static const char* reason[] =
 	"",
 
 	//51 ~ 60
-	"链表数据写入失败",
-	"链表数据读取失败",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-
-	//61 ~ 65
-	"二进制文件头写入失败"
+	"二进制文件头写入失败",
 	"二进制地图符号写入失败",
 	"二进制地图写入失败",
+	"二进制链表写入失败",
+	"",
+	"",
+	"",
+	"",
 	"",
 	"",
 
-	//66 ~ 75
+	//61 ~ 70
 	"二进制文件头读取失败",
-	"文件头校验信息不符",
-	"文件头大小不符",
-	"地图符号定位失败",
-	"地图符号读取失败",
-	"地图定位失败",
-	"地图读取失败",
-	"链表定位失败",
-	"链表读取失败",
+	"二进制文件头校验信息不符",
+	"二进制文件头大小不符",
+	"二进制地图符号定位失败",
+	"二进制地图符号读取失败",
+	"二进制地图定位失败",
+	"二进制地图读取失败",
+	"二进制链表定位失败",
+	"二进制链表读取失败",
 	"",
 };
 
