@@ -8,7 +8,7 @@
 #include <conio.h>
 
 #define Cooder			"Ð¡³Â"
-#define VersionNumber	"3.4"
+#define VersionNumber	"3.5"
 //#define CoodingDay		"2021/05/05"
 #define CopyRightYear	"2021"
 

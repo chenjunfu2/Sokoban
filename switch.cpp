@@ -47,8 +47,9 @@ ctu_s:
 		see_cursor_hide_show(false);
 		{
 			int mpn = 1;
+			map_a mpa;
 
-			map_a mpa = read_mapCp(mpj, fin_a, mpn);
+			mpa = read_mapCp(mpj, fin_a, mpn);
 			while (!error(mpa.error))
 			{
 				system("cls");
@@ -139,15 +140,22 @@ ctu_s:
 		{
 			bool p;
 			string str;
+			map_a mpa;
 
 			ShowCursor(true);//显示光标
 			{
-				cout << "请输入文件名：";
+				cout << "请输入文件名(输入\\q或\\Q返回上层)：";
 				getline(cin, str, '\n');
+				if (str == "\\q" || str == "\\Q")
+				{
+					ShowCursor(false);//隐藏光标
+					goto game_i;
+				}
 			}
 			ShowCursor(false);//隐藏光标
 
-			map_a mpa = Read_MLD(str.c_str(), p);
+			if(error((mpa = Read_MLD(str.c_str(), p)).error))
+				goto br2;
 			if (p)
 			{
 				cout << "不是残局文件！" << endl;
@@ -192,23 +200,37 @@ ctu_s:
 			bool p;
 			int iptn;
 			string str;
+			map_a mpa;
 
 			ShowCursor(true);//显示光标
 			{
-				cout << "请输入文件名：";
+				cout << "请输入文件名(输入\\q或\\Q返回上层)：";
 				getline(cin, str, '\n');
+				if (str == "\\q" || str == "\\Q")
+				{
+					ShowCursor(false);//隐藏光标
+					goto game_i;
+				}
 
-				cout << "请输入操作间隔：";
+				cout << "请输入操作间隔(输入-1返回上层)：";
 				while (!(cin >> iptn))
 				{
 					cout << "请重新输入" << endl;
 					cin.clear();
 				}
 				while (getchar() != '\n') continue;
+				if (iptn == -1)
+				{
+					ShowCursor(false);//隐藏光标
+					goto game_i;
+				}
 			}
 			ShowCursor(false);//隐藏光标
+			
+				
 
-			map_a mpa = Read_MLD(str.c_str(), p);
+			if (error((mpa = Read_MLD(str.c_str(), p)).error))
+				goto br3;
 			if (!p)
 			{
 				ShowCursor(true);
@@ -225,6 +247,9 @@ ctu_s:
 			system("cls");
 			see_cursor_hide_show(false);
 			goto game_i;
+
+		br3:
+			cout << "游戏结束！" << endl << endl << flush;//换行并刷新缓冲区
 		}
 		break;
 	case '4'://返回上层

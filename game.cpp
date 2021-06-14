@@ -469,12 +469,12 @@ start1:
 //进行游戏
 int game(map_a& mpa)
 {
-	peo pe = find_peo(mpa.map, mpa.mapx, mpa.mapy);
-	if (error(pe.error))
-		return ERROR;
-	int keyb = 0;
-	//NODE nodeR, nodeF;
+	peo pe;
+	int keyb;
 
+	if (error((pe = find_peo(mpa.map, mpa.mapx, mpa.mapy)).error))
+		return ERROR;
+	see_cursor_hide_show(false);
 	if (error(init_map(mpa.map, mpa.mapx, mpa.mapy, mpa.map_f)))//绘制全地图
 		return ERROR;
 	cout << "第" << mpa.nodeRnum << "步" << "  ";
@@ -514,12 +514,15 @@ int game(map_a& mpa)
 			break;
 		case REGAME:
 			system("cls");
-			cout << "第" << mpa.checkpoint << "关";
-			Sleep(1100);
+			if (mpa.checkpoint != 0)
+			{
+				cout << "第" << mpa.checkpoint << "关";
+				Sleep(1100);
+			}
 			copy_lmapTOmap(mpa);
 			init_map_data(mpa);
-			pe = find_peo(mpa.map, mpa.mapx, mpa.mapy);
-			if (error(pe.error)) return ERROR;
+			if (error((pe = find_peo(mpa.map, mpa.mapx, mpa.mapy)).error)) return ERROR;
+			see_cursor_hide_show(false);
 			if (error(init_map(mpa.map, mpa.mapx, mpa.mapy, mpa.map_f))) return ERROR;
 			cout << "第" << mpa.nodeRnum << "步" << "  ";
 			goto con1;

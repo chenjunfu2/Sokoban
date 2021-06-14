@@ -22,7 +22,8 @@
 
 //返回处理
 #undef ERROR
-#define ERROR		-1//错误
+#define ERROR		-1//可恢复错误
+#define EXITERROR	-2//不可恢复错误
 #define LASTCHECK	5//上一关
 #define NEXTCHECK	6//下一关
 #define SWITCH		7//选关

@@ -46,9 +46,9 @@
 #define Blink_WriteFalse		0x0036
 
 //read_map_list 61 ~ 70
-#define binhead_ReadFalse		0x0037
-#define bhStrFalse				0x0038
-#define bhSizeFalse				0x0039
+#define binhead_ReadFalse		0x003D
+#define bhStrFalse				0x003E
+#define bhSizeFalse				0x003F
 #define Bmapf_SeekFalse			0x0040
 #define Bmapf_ReadFalse			0x0041
 #define Bmap_SeekFalse			0x0042

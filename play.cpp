@@ -4,16 +4,15 @@ using namespace std;
 
 int game_p(map_a& mpa, DWORD msec, bool playback)
 {
+	peo pe;
+	unsigned int nodenum = 0;
+
 	if (!playback)
 		copy_lmapTOmap(mpa);
-	peo pe = find_peo(mpa.map, mpa.mapx, mpa.mapy);
-	if (error(pe.error))
+
+	if (error((pe = find_peo(mpa.map, mpa.mapx, mpa.mapy)).error))
 		return ERROR;
-
-	unsigned int nodenum = 0;
-	//NODE nodeR = mpa.nodeF, nodeF = mpa.nodeR;
-	
-
+	see_cursor_hide_show(false);
 	if (error(init_map(mpa.map, mpa.mapx, mpa.mapy, mpa.map_f)))//绘制全地图
 		return ERROR;
 	cout << "第" << nodenum << "步" << "  ";
@@ -25,11 +24,8 @@ int game_p(map_a& mpa, DWORD msec, bool playback)
 		++nodenum;
 
 		see_cursor_hide_show(false);
-
 		if (error(init_peo(mpa.map, mpa.mapx, mpa.mapy, mpa.map_f, pe)))//绘制更新后的地图
-		{
 			return ERROR;
-		}
 		cout << "第" << nodenum << "步" << "  ";
 	}
 
