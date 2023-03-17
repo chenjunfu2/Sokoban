@@ -380,9 +380,9 @@ start1:
 	case 'S':
 		if ((mov = move_user(map, mx, my, 0, +1, pe, nodeR, nodeF)) == false)goto start1;
 		break;
-	case 'r'://revoke
+	case 'r'://undo
 	case 'R':
-		mov = REVOKE;
+		mov = UNDO;
 		if (!move_r(map, mx, my, pe, nodeR, nodeF))
 			goto start1;
 		break;
@@ -403,7 +403,7 @@ start1:
 			mov = NODO;
 		ShowCursor(false);
 		break;
-	case 'c':
+	case 'c'://choose
 	case 'C':
 		ShowCursor(true);
 		if (sure("进入选关"))
@@ -436,7 +436,7 @@ start1:
 			mov = NODO;
 		ShowCursor(false);
 		break;
-	case 'v':
+	case 'v'://savegame
 	case 'V':
 		ShowCursor(true);
 		if (sure("保存残局"))
@@ -502,7 +502,7 @@ int game(map_a& mpa)
 				mpa.nodeFnum = 0;//重做链表节点数置零
 			}
 			break;
-		case REVOKE:
+		case UNDO:
 			--mpa.nodeRnum;//撤销链表节点数递减
 			++mpa.nodeFnum;//重做链表节点数递增
 			break;

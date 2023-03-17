@@ -16,7 +16,7 @@
 //直接处理
 #define REDO		0//重做
 #define MOVE		1//移动
-#define REVOKE		2//撤销
+#define UNDO		2//撤销
 #define NODO		3//重绘
 #define REGAME		4//重玩
 
@@ -35,7 +35,8 @@
 
 
 //玩家坐标结构体
-typedef struct peo {
+typedef struct peo
+{
 	int x = 0;
 	int y = 0;
 	ERR error;

@@ -93,7 +93,7 @@ bool jump_map(fstream& fin_a, map_j& mpj, map_a& mpa, int map_num)
 		return true;
 
 	fin_a.clear();
-	fin_a.seekg(mpj.map_checkpoint[map_num - 1], ios::beg);
+	fin_a.seekg(mpj.map_checkpoint[(std::streamoff)map_num - 1], ios::beg);
 
 	if (!fin_a.good())
 	{

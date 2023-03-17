@@ -11,9 +11,11 @@
 #include "error.h"
 #include "linked_list.h"
 
+typedef unsigned long long ULL;
 
 //地图及符号数组结构体
-typedef struct map_a {
+typedef struct map_a
+{
 	//地图大小及指针
 	unsigned int mapx = 0;
 	unsigned int mapy = 0;
@@ -34,11 +36,12 @@ typedef struct map_a {
 }MAPA;
 
 //关卡选择结构体
-typedef struct map_j {
+typedef struct map_j
+{
 	//关卡个数
-	int map_num = 0;
+	ULL map_num = 0;
 	//关卡文件位置
-	std::vector<std::streampos> map_checkpoint;
+	std::vector<std::streamoff> map_checkpoint;
 	//是否错误及报错码
 	ERR error;
 }MAPJ;

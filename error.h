@@ -192,7 +192,8 @@ static const char* reason[] =
 	"",
 };
 
-typedef struct err {
+typedef struct err
+{
 	bool no_good = false;
 	unsigned err_num = GOOD_ERR;//´íÎóÂë
 	unsigned err_fun = 0x0000;//±¨´íº¯Êı

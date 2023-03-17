@@ -54,7 +54,7 @@ extern inline void menu_explain(void)
 	cout << "5.游戏地图可编辑，可增删，但请严格遵守地图注意事项并根据地图表现型对应修改\n\n";
 	cout << "感谢您的理解与支持，如有BUG还请及时反馈哦~\n";
 	cout << "\n按任意键返回...\n";
-	_getch();
+	(void)_getch();
 
 	return;
 }
@@ -62,14 +62,14 @@ extern inline void menu_explain(void)
 //关于应用
 extern inline void menu_about(void)
 {
-	cout << "--------------关于-------------\n";
-	cout << " 编 写 者：" << Cooder << "\n";
-	cout << " 编写日期：" << __DATE__<< " " << __TIME__ << "\n";//CoodingDay
-	cout << " 版 本 号：" << VersionNumber << "\n";
-	cout << " 版权所有：CopyRight (C) " << CopyRightYear << "\n";
-	cout << "-------------------------------\n";
+	cout << "---------------关于--------------\n";
+	cout << " 编 写 者：" Cooder "\n";
+	cout << " 编写日期：" __DATE__ " " __TIME__ "\n";//CoodingDay
+	cout << " 版 本 号：" VersionNumber "\n";
+	cout << " 版权所有：CopyRight(C)" CopyRightYearBeg "-" CopyRightYearEnd "\n";
+	cout << "---------------------------------\n";
 	cout << "\n按任意键返回...\n";
-	_getch();
+	(void)_getch();
 
 	return;
 }
@@ -80,7 +80,7 @@ extern inline void menu_about(void)
 extern inline void sypose(void)
 {
 	cout << "请按任意键继续. . .";
-	_getch();
+	(void)_getch();
 }
 
 //让用户确定是否做某事

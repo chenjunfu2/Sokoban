@@ -7,10 +7,10 @@
 #include <string>
 #include <conio.h>
 
-#define Cooder			"小陈"
-#define VersionNumber	"3.5"
-//#define CoodingDay		"2021/05/05"
-#define CopyRightYear	"2021"
+#define Cooder				"小陈"
+#define VersionNumber		"3.6"
+#define CopyRightYearBeg	"2021"
+#define CopyRightYearEnd	"2023"
 
 //主菜单
 extern inline int menu_page(void);

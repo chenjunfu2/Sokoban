@@ -10,7 +10,8 @@
 
 
 //数据结构体
-typedef struct Queue {
+typedef struct Queue
+{
 	Queue* uQueue = NULL;//上一节点
 	int list_x = 0;//移动数据x
 	int list_y = 0;//移动数据y
@@ -19,7 +20,8 @@ typedef struct Queue {
 }QUEUE;
 
 //链表指针结构体
-typedef struct Node {
+typedef struct Node
+{
 	QUEUE* hpQueue = NULL;//头节点指针
 	QUEUE* cpQueue = NULL;//尾节点指针
 	//int numQueue;//链表个数
